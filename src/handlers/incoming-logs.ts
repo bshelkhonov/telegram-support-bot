@@ -1,23 +1,23 @@
-import type { Bot, Context } from "grammy";
-import type { Logger } from "pino";
+import type { Bot, Context } from "grammy"
+import type { Logger } from "pino"
 
 interface RegisterIncomingLogsHandlerOptions {
-  logger: Logger;
+  logger: Logger
 }
 
 const extractCommand = (ctx: Context): string | null => {
-  const text = ctx.msg?.text;
+  const text = ctx.msg?.text
   if (!text) {
-    return null;
+    return null
   }
 
-  const match = text.match(/^\/\S+/);
-  return match?.[0] ?? null;
-};
+  const match = text.match(/^\/\S+/)
+  return match?.[0] ?? null
+}
 
 export const registerIncomingLogsHandler = (
   bot: Bot<Context>,
-  options: RegisterIncomingLogsHandlerOptions
+  options: RegisterIncomingLogsHandlerOptions,
 ): void => {
   bot.use(async (ctx, next) => {
     if (ctx.msg) {
@@ -31,12 +31,12 @@ export const registerIncomingLogsHandler = (
           chatType: ctx.chat?.type,
           text: ctx.msg.text ?? null,
           caption: ctx.msg.caption ?? null,
-          command: extractCommand(ctx)
+          command: extractCommand(ctx),
         },
-        "Incoming message"
-      );
+        "Incoming message",
+      )
     }
 
-    await next();
-  });
-};
+    await next()
+  })
+}

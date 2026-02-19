@@ -1,11 +1,16 @@
-import js from "@eslint/js";
-import globals from "globals";
-import tseslint from "typescript-eslint";
+import js from "@eslint/js"
+import eslintConfigPrettier from "eslint-config-prettier"
+import globals from "globals"
+import tseslint from "typescript-eslint"
 
 export default tseslint.config(
   { ignores: ["dist/**", "node_modules/**", "data/**"] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommendedTypeChecked,
+      eslintConfigPrettier,
+    ],
     files: ["src/**/*.ts"],
     languageOptions: {
       ecmaVersion: 2022,
@@ -13,14 +18,14 @@ export default tseslint.config(
       globals: globals.node,
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: import.meta.dirname
-      }
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     rules: {
       "@typescript-eslint/no-confusing-void-expression": [
         "error",
-        { ignoreArrowShorthand: true }
-      ]
-    }
-  }
-);
+        { ignoreArrowShorthand: true },
+      ],
+    },
+  },
+)

@@ -1,31 +1,31 @@
-import type { SqliteDatabase } from "./db";
+import type { SqliteDatabase } from "./db"
 
 export interface UserTopicBinding {
-  userId: number;
-  threadId: number;
-  fullName: string;
-  username: string | null;
-  topicTitle: string;
-  createdAt: string;
-  updatedAt: string;
+  userId: number
+  threadId: number
+  fullName: string
+  username: string | null
+  topicTitle: string
+  createdAt: string
+  updatedAt: string
 }
 
 interface NewUserTopicBinding {
-  userId: number;
-  threadId: number;
-  fullName: string;
-  username: string | null;
-  topicTitle: string;
+  userId: number
+  threadId: number
+  fullName: string
+  username: string | null
+  topicTitle: string
 }
 
 interface UserTopicRow {
-  user_id: number;
-  thread_id: number;
-  full_name: string;
-  username: string | null;
-  topic_title: string;
-  created_at: string;
-  updated_at: string;
+  user_id: number
+  thread_id: number
+  full_name: string
+  username: string | null
+  topic_title: string
+  created_at: string
+  updated_at: string
 }
 
 const mapRow = (row: UserTopicRow): UserTopicBinding => ({
@@ -35,8 +35,8 @@ const mapRow = (row: UserTopicRow): UserTopicBinding => ({
   username: row.username,
   topicTitle: row.topic_title,
   createdAt: row.created_at,
-  updatedAt: row.updated_at
-});
+  updatedAt: row.updated_at,
+})
 
 export class TopicStore {
   constructor(private readonly db: SqliteDatabase) {}
@@ -44,21 +44,21 @@ export class TopicStore {
   getByUserId(userId: number): UserTopicBinding | null {
     const row = this.db
       .prepare("SELECT * FROM user_topics WHERE user_id = ?")
-      .get(userId) as UserTopicRow | undefined;
+      .get(userId) as UserTopicRow | undefined
 
-    return row ? mapRow(row) : null;
+    return row ? mapRow(row) : null
   }
 
   getByThreadId(threadId: number): UserTopicBinding | null {
     const row = this.db
       .prepare("SELECT * FROM user_topics WHERE thread_id = ?")
-      .get(threadId) as UserTopicRow | undefined;
+      .get(threadId) as UserTopicRow | undefined
 
-    return row ? mapRow(row) : null;
+    return row ? mapRow(row) : null
   }
 
   create(binding: NewUserTopicBinding): UserTopicBinding {
-    const now = new Date().toISOString();
+    const now = new Date().toISOString()
 
     this.db
       .prepare(
@@ -72,7 +72,7 @@ export class TopicStore {
           created_at,
           updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?)
-      `
+      `,
       )
       .run(
         binding.userId,
@@ -81,13 +81,13 @@ export class TopicStore {
         binding.username,
         binding.topicTitle,
         now,
-        now
-      );
+        now,
+      )
 
     return {
       ...binding,
       createdAt: now,
-      updatedAt: now
-    };
+      updatedAt: now,
+    }
   }
 }

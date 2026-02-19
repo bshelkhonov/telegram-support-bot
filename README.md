@@ -44,6 +44,7 @@ LOG_LEVEL=info
 
 ```bash
 pnpm install
+pnpm run format:check
 pnpm run lint
 pnpm run typecheck
 pnpm run build

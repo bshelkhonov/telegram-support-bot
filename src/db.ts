@@ -1,14 +1,14 @@
-import Database from "better-sqlite3";
-import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import Database from "better-sqlite3"
+import { mkdirSync } from "node:fs"
+import { dirname } from "node:path"
 
-export type SqliteDatabase = Database.Database;
+export type SqliteDatabase = Database.Database
 
 export const initDatabase = (databasePath: string): SqliteDatabase => {
-  mkdirSync(dirname(databasePath), { recursive: true });
+  mkdirSync(dirname(databasePath), { recursive: true })
 
-  const db = new Database(databasePath);
-  db.pragma("journal_mode = WAL");
+  const db = new Database(databasePath)
+  db.pragma("journal_mode = WAL")
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS user_topics (
@@ -26,7 +26,7 @@ export const initDatabase = (databasePath: string): SqliteDatabase => {
       value TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
-  `);
+  `)
 
-  return db;
-};
+  return db
+}
