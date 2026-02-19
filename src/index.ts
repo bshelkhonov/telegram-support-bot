@@ -56,15 +56,19 @@ const bootstrap = async (): Promise<void> => {
     logger.error({ updateId: ctx.update.update_id, err }, "Unhandled bot error");
   });
 
-  const shutdown = (signal: string): void => {
+  const shutdown = async (signal: string): Promise<void> => {
     logger.info({ signal }, "Shutting down bot");
-    bot.stop();
+    await bot.stop();
     db.close();
     process.exit(0);
   };
 
-  process.once("SIGINT", () => shutdown("SIGINT"));
-  process.once("SIGTERM", () => shutdown("SIGTERM"));
+  process.once("SIGINT", () => {
+    void shutdown("SIGINT");
+  });
+  process.once("SIGTERM", () => {
+    void shutdown("SIGTERM");
+  });
 
   await bot.start({
     allowed_updates: ["message"],
@@ -75,7 +79,6 @@ const bootstrap = async (): Promise<void> => {
 };
 
 bootstrap().catch((error) => {
-  // eslint-disable-next-line no-console
   console.error("Fatal bootstrap error", error);
   process.exit(1);
 });

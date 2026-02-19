@@ -9,21 +9,27 @@
   },
   "scripts": {
     "dev": "tsx watch /Users/shelbulat/Work/support-bot/src/index.ts",
+    "lint": "eslint /Users/shelbulat/Work/support-bot/src",
+    "typecheck": "tsc -p /Users/shelbulat/Work/support-bot/tsconfig.json --noEmit",
     "build": "tsc -p /Users/shelbulat/Work/support-bot/tsconfig.json",
     "start": "node /Users/shelbulat/Work/support-bot/dist/index.js"
   },
   "dependencies": {
-    "better-sqlite3": "^11.9.1",
-    "dotenv": "^16.6.1",
-    "grammy": "^1.38.3",
-    "pino": "^9.9.0",
-    "zod": "^4.1.5"
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.3.1",
+    "grammy": "^1.40.0",
+    "pino": "^10.3.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^22.18.6",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.2"
+    "@types/node": "^25.3.0",
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
