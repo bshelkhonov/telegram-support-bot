@@ -8,11 +8,11 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "tsx watch /Users/shelbulat/Work/support-bot/src/index.ts",
-    "lint": "eslint /Users/shelbulat/Work/support-bot/src",
-    "typecheck": "tsc -p /Users/shelbulat/Work/support-bot/tsconfig.json --noEmit",
-    "build": "tsc -p /Users/shelbulat/Work/support-bot/tsconfig.json",
-    "start": "node /Users/shelbulat/Work/support-bot/dist/index.js"
+    "dev": "tsx watch src/index.ts",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
