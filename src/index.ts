@@ -5,6 +5,7 @@ import { initDatabase } from "./db"
 import { registerAdminReplyHandler } from "./handlers/admin-replies"
 import { registerGreetingEditorHandler } from "./handlers/greeting-editor"
 import { registerIncomingLogsHandler } from "./handlers/incoming-logs"
+import { registerMemberStatusHandler } from "./handlers/member-status"
 import { registerStartHandler } from "./handlers/start"
 import { registerUserMessageHandler } from "./handlers/user-messages"
 import { createLogger } from "./logger"
@@ -29,6 +30,11 @@ const bootstrap = async (): Promise<void> => {
   )
 
   registerIncomingLogsHandler(bot, { logger })
+  registerMemberStatusHandler(bot, {
+    adminChatId: config.adminChatId,
+    topicStore,
+    logger,
+  })
   registerStartHandler(bot, { settingsStore })
   registerGreetingEditorHandler(bot, {
     editorUserIds: config.editorUserIds,
@@ -88,7 +94,7 @@ const bootstrap = async (): Promise<void> => {
   })
 
   await bot.start({
-    allowed_updates: ["message"],
+    allowed_updates: ["message", "my_chat_member"],
     onStart: () => {
       logger.info(
         { botId: me.id, username: me.username },

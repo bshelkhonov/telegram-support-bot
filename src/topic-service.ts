@@ -61,6 +61,10 @@ export class TopicService {
     number,
     Promise<UserTopicBinding>
   >()
+  private readonly inFlightRecreates = new Map<
+    number,
+    Promise<UserTopicBinding>
+  >()
 
   constructor(
     private readonly bot: Bot,
@@ -80,6 +84,20 @@ export class TopicService {
     })
 
     this.inFlightEnsures.set(user.id, operation)
+    return operation
+  }
+
+  async recreateForUser(user: User): Promise<UserTopicBinding> {
+    const pending = this.inFlightRecreates.get(user.id)
+    if (pending) {
+      return pending
+    }
+
+    const operation = this.recreateForUserInternal(user).finally(() => {
+      this.inFlightRecreates.delete(user.id)
+    })
+
+    this.inFlightRecreates.set(user.id, operation)
     return operation
   }
 
@@ -135,6 +153,39 @@ export class TopicService {
         topicTitle: binding.topicTitle,
       },
       "Created forum topic for user",
+    )
+
+    return binding
+  }
+
+  private async recreateForUserInternal(user: User): Promise<UserTopicBinding> {
+    const previous = this.topicStore.getByUserId(user.id)
+    const topicTitle = buildTopicTitle(user)
+    const forumTopic = await this.bot.api.createForumTopic(
+      this.adminChatId,
+      topicTitle,
+    )
+
+    const binding = this.topicStore.upsert({
+      userId: user.id,
+      threadId: forumTopic.message_thread_id,
+      fullName: buildFullName(user),
+      username: user.username ?? null,
+      topicTitle,
+    })
+
+    await this.bot.api.sendMessage(this.adminChatId, buildUserCard(user), {
+      message_thread_id: binding.threadId,
+    })
+
+    this.logger.info(
+      {
+        userId: binding.userId,
+        previousThreadId: previous?.threadId ?? null,
+        threadId: binding.threadId,
+        topicTitle: binding.topicTitle,
+      },
+      "Recreated forum topic for user",
     )
 
     return binding

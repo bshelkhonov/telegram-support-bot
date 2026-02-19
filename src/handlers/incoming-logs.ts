@@ -37,6 +37,21 @@ export const registerIncomingLogsHandler = (
       )
     }
 
+    if (ctx.myChatMember) {
+      options.logger.info(
+        {
+          updateId: ctx.update.update_id,
+          chatId: ctx.myChatMember.chat.id,
+          chatType: ctx.myChatMember.chat.type,
+          fromId: ctx.myChatMember.from.id,
+          fromUsername: ctx.myChatMember.from.username ?? null,
+          oldStatus: ctx.myChatMember.old_chat_member.status,
+          newStatus: ctx.myChatMember.new_chat_member.status,
+        },
+        "Incoming my_chat_member update",
+      )
+    }
+
     await next()
   })
 }

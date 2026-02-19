@@ -90,4 +90,45 @@ export class TopicStore {
       updatedAt: now,
     }
   }
+
+  upsert(binding: NewUserTopicBinding): UserTopicBinding {
+    const now = new Date().toISOString()
+
+    this.db
+      .prepare(
+        `
+        INSERT INTO user_topics (
+          user_id,
+          thread_id,
+          full_name,
+          username,
+          topic_title,
+          created_at,
+          updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(user_id) DO UPDATE SET
+          thread_id = excluded.thread_id,
+          full_name = excluded.full_name,
+          username = excluded.username,
+          topic_title = excluded.topic_title,
+          updated_at = excluded.updated_at
+      `,
+      )
+      .run(
+        binding.userId,
+        binding.threadId,
+        binding.fullName,
+        binding.username,
+        binding.topicTitle,
+        now,
+        now,
+      )
+
+    const updated = this.getByUserId(binding.userId)
+    if (!updated) {
+      throw new Error("Failed to upsert user topic binding")
+    }
+
+    return updated
+  }
 }

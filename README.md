@@ -68,10 +68,13 @@ pnpm rebuild better-sqlite3
 ## Relay rules
 
 - Private user messages are forwarded to admin forum topic (non-anonymous).
+- If a mapped forum topic was deleted, the bot recreates it automatically and retries forwarding.
 - Admin-to-user relay works only for messages in `ADMIN_CHAT_ID` with `message_thread_id`.
 - Only admin messages that are replies to a forwarded user message in that topic are relayed to the user anonymously.
 - Fallback for groups with privacy mode: use `/r <message>` (or `/reply <message>`) as a reply in the user topic.
 - If user blocked the bot, the bot posts a warning in that admin topic.
+- Bot also handles `my_chat_member` updates and posts user status changes to the user topic in real time.
+- Long polling runs with `allowed_updates` including `my_chat_member`.
 
 ## Greeting editor commands
 
