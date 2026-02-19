@@ -1,13 +1,22 @@
 import type { Bot, Context } from "grammy";
+import { BotSettingsStore } from "../bot-settings-store";
 
-const START_MESSAGE = "Hello!\n\nYou can contact us using this bot.";
+const DEFAULT_START_MESSAGE = "Hello!\n\nYou can contact us using this bot.";
 
-export const registerStartHandler = (bot: Bot<Context>): void => {
+interface RegisterStartHandlerOptions {
+  settingsStore: BotSettingsStore;
+}
+
+export const registerStartHandler = (
+  bot: Bot<Context>,
+  options: RegisterStartHandlerOptions
+): void => {
   bot.command("start", async (ctx) => {
     if (ctx.chat?.type !== "private") {
       return;
     }
 
-    await ctx.reply(START_MESSAGE);
+    const greeting = options.settingsStore.getStartGreeting() ?? DEFAULT_START_MESSAGE;
+    await ctx.reply(greeting);
   });
 };

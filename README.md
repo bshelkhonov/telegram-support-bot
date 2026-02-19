@@ -12,6 +12,8 @@ Hello!
 You can contact us using this bot.
 ```
 
+- Allows selected editors to update `/start` greeting via `/setgreeting` in private chat.
+- Supports `/cancel` to abort an active `/setgreeting` flow.
 - Relays each private user message to an admin forum supergroup topic via forward (non-anonymous).
 - Creates one forum topic per user and reuses it for future messages.
 - Relays admin replies back to the user anonymously (only when admin replies to a bot message in that topic).
@@ -31,9 +33,12 @@ Copy `.env.example` to `.env` and set values:
 ```env
 BOT_TOKEN=123456789:your_bot_token
 ADMIN_CHAT_ID=-1001234567890
+EDITOR_USER_IDS=11111111,22222222
 DATABASE_PATH=./data/support-bot.sqlite
 LOG_LEVEL=info
 ```
+
+- `EDITOR_USER_IDS` is a comma-separated list of Telegram `user_id` values allowed to edit greeting text in private chat.
 
 ## Install and run
 
@@ -67,6 +72,12 @@ pnpm rebuild better-sqlite3
 - Fallback for groups with privacy mode: use `/r <message>` (or `/reply <message>`) as a reply in the user topic.
 - If user blocked the bot, the bot posts a warning in that admin topic.
 
+## Greeting editor commands
+
+- `/setgreeting` works only in private chat and only for `EDITOR_USER_IDS`.
+- After `/setgreeting`, send one text message in Russian to save it as the new `/start` greeting.
+- `/cancel` aborts active greeting editing flow.
+
 ## Data storage
 
 SQLite table `user_topics` keeps mapping:
@@ -77,6 +88,12 @@ SQLite table `user_topics` keeps mapping:
 - `username`
 - `topic_title`
 - `created_at`
+- `updated_at`
+
+SQLite table `bot_settings` stores bot-level values:
+
+- `key`
+- `value`
 - `updated_at`
 
 Default DB path: `./data/support-bot.sqlite`.

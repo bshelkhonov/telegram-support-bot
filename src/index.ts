@@ -1,7 +1,10 @@
 import { Bot, GrammyError, HttpError } from "grammy";
+import { BotSettingsStore } from "./bot-settings-store";
 import { loadConfig } from "./config";
 import { initDatabase } from "./db";
 import { registerAdminReplyHandler } from "./handlers/admin-replies";
+import { registerGreetingEditorHandler } from "./handlers/greeting-editor";
+import { registerIncomingLogsHandler } from "./handlers/incoming-logs";
 import { registerStartHandler } from "./handlers/start";
 import { registerUserMessageHandler } from "./handlers/user-messages";
 import { createLogger } from "./logger";
@@ -16,10 +19,16 @@ const bootstrap = async (): Promise<void> => {
   const bot = new Bot(config.botToken);
   const me = await bot.api.getMe();
 
+  const settingsStore = new BotSettingsStore(db);
   const topicStore = new TopicStore(db);
   const topicService = new TopicService(bot, config.adminChatId, topicStore, logger);
 
-  registerStartHandler(bot);
+  registerIncomingLogsHandler(bot, { logger });
+  registerStartHandler(bot, { settingsStore });
+  registerGreetingEditorHandler(bot, {
+    editorUserIds: config.editorUserIds,
+    settingsStore
+  });
   registerUserMessageHandler(bot, {
     adminChatId: config.adminChatId,
     topicService,

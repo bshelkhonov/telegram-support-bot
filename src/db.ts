@@ -19,6 +19,12 @@ export const initDatabase = (databasePath: string): SqliteDatabase => {
       topic_title TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS bot_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TEXT NOT NULL
     )
   `);
 
