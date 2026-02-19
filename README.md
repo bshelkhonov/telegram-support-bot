@@ -101,3 +101,7 @@ SQLite table `bot_settings` stores bot-level values:
 - `updated_at`
 
 Default DB path: `./data/support-bot.sqlite`.
+
+## License
+
+MIT. See `LICENSE`.
