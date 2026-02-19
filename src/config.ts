@@ -20,7 +20,7 @@ const envSchema = z.object({
 });
 
 export const loadConfig = (): EnvConfig => {
-  loadDotEnv();
+  loadDotEnv({ quiet: true });
 
   const parsed = envSchema.safeParse(process.env);
   if (!parsed.success) {
