@@ -11,6 +11,7 @@ import { registerUserMessageHandler } from "./handlers/user-messages"
 import { createLogger } from "./logger"
 import { TopicService } from "./topic-service"
 import { TopicStore } from "./topic-store"
+import { UserChatActivityStore } from "./user-chat-activity-store"
 
 const bootstrap = async (): Promise<void> => {
   const config = loadConfig()
@@ -22,6 +23,7 @@ const bootstrap = async (): Promise<void> => {
 
   const settingsStore = new BotSettingsStore(db)
   const topicStore = new TopicStore(db)
+  const chatActivityStore = new UserChatActivityStore(db)
   const topicService = new TopicService(
     bot,
     config.adminChatId,
@@ -35,7 +37,7 @@ const bootstrap = async (): Promise<void> => {
     topicStore,
     logger,
   })
-  registerStartHandler(bot, { settingsStore })
+  registerStartHandler(bot, { settingsStore, chatActivityStore })
   registerGreetingEditorHandler(bot, {
     editorUserIds: config.editorUserIds,
     settingsStore,
@@ -43,12 +45,15 @@ const bootstrap = async (): Promise<void> => {
   registerUserMessageHandler(bot, {
     adminChatId: config.adminChatId,
     topicService,
+    settingsStore,
+    chatActivityStore,
     logger,
   })
   registerAdminReplyHandler(bot, {
     adminChatId: config.adminChatId,
     botId: me.id,
     topicStore,
+    chatActivityStore,
     logger,
   })
 

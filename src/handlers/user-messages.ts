@@ -1,12 +1,20 @@
 import { GrammyError, type Bot, type Context } from "grammy"
 import type { Logger } from "pino"
+import { BotSettingsStore } from "../bot-settings-store"
 import { TopicService } from "../topic-service"
+import { UserChatActivityStore } from "../user-chat-activity-store"
 
 interface RegisterUserMessageHandlerOptions {
   adminChatId: number
   topicService: TopicService
+  settingsStore: BotSettingsStore
+  chatActivityStore: UserChatActivityStore
   logger: Logger
 }
+
+const DEFAULT_FIRST_REPLY_MESSAGE =
+  "Мы зафиксировали ваше обращение. Ответим вам в ближайшее время."
+const COMMAND_PATTERN = /^\/[A-Za-z0-9_]+(?:@[A-Za-z0-9_]+)?(?:\s|$)/
 
 const isMissingTopicError = (error: GrammyError): boolean =>
   error.error_code === 400 &&
@@ -26,6 +34,11 @@ export const registerUserMessageHandler = (
       return
     }
 
+    const isCommand =
+      typeof ctx.msg.text === "string" && COMMAND_PATTERN.test(ctx.msg.text)
+    const shouldSendFirstReply =
+      !isCommand && options.chatActivityStore.isInactiveFor24h(ctx.from.id)
+
     const forwardToThread = async (threadId: number): Promise<void> => {
       await ctx.api.forwardMessage(
         options.adminChatId,
@@ -42,7 +55,6 @@ export const registerUserMessageHandler = (
 
       try {
         await forwardToThread(binding.threadId)
-        return
       } catch (error) {
         if (error instanceof GrammyError && isMissingTopicError(error)) {
           options.logger.warn(
@@ -72,10 +84,9 @@ export const registerUserMessageHandler = (
             },
             "Relayed user message after topic recreation",
           )
-          return
+        } else {
+          throw error
         }
-
-        throw error
       }
     } catch (error) {
       if (error instanceof GrammyError) {
@@ -88,6 +99,37 @@ export const registerUserMessageHandler = (
             description: error.description,
           },
           "Failed to relay user message",
+        )
+        return
+      }
+
+      throw error
+    }
+
+    options.chatActivityStore.touch(ctx.from.id)
+
+    if (!shouldSendFirstReply) {
+      return
+    }
+
+    const firstReplyMessage =
+      options.settingsStore.getFirstReplyMessage() ??
+      DEFAULT_FIRST_REPLY_MESSAGE
+
+    try {
+      await ctx.api.sendMessage(ctx.chat.id, firstReplyMessage)
+      options.chatActivityStore.touch(ctx.from.id)
+    } catch (error) {
+      if (error instanceof GrammyError) {
+        options.logger.warn(
+          {
+            userId: ctx.from.id,
+            chatId: ctx.chat.id,
+            messageId: ctx.msg.message_id,
+            errorCode: error.error_code,
+            description: error.description,
+          },
+          "Failed to send first-reply confirmation message",
         )
         return
       }

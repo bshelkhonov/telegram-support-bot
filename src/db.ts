@@ -25,6 +25,12 @@ export const initDatabase = (databasePath: string): SqliteDatabase => {
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL,
       updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS user_chat_activity (
+      user_id INTEGER PRIMARY KEY,
+      last_activity_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
     )
   `)
 

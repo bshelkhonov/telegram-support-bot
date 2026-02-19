@@ -1,11 +1,13 @@
 import { GrammyError, type Bot, type Context } from "grammy"
 import type { Logger } from "pino"
 import { TopicStore } from "../topic-store"
+import { UserChatActivityStore } from "../user-chat-activity-store"
 
 interface RegisterAdminReplyHandlerOptions {
   adminChatId: number
   botId: number
   topicStore: TopicStore
+  chatActivityStore: UserChatActivityStore
   logger: Logger
 }
 
@@ -80,6 +82,7 @@ export const registerAdminReplyHandler = (
 
         try {
           await ctx.api.sendMessage(binding.userId, commandText)
+          options.chatActivityStore.touch(binding.userId)
           return
         } catch (error) {
           if (error instanceof GrammyError && isBlockedByUserError(error)) {
@@ -123,6 +126,7 @@ export const registerAdminReplyHandler = (
         options.adminChatId,
         ctx.msg.message_id,
       )
+      options.chatActivityStore.touch(binding.userId)
     } catch (error) {
       if (error instanceof GrammyError && isBlockedByUserError(error)) {
         await ctx.api.sendMessage(
