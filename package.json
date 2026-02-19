@@ -1,0 +1,34 @@
+{
+  "name": "telegram-support-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Telegram support bot built with TypeScript and grammY",
+  "packageManager": "pnpm@10.16.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx watch /Users/shelbulat/Work/support-bot/src/index.ts",
+    "build": "tsc -p /Users/shelbulat/Work/support-bot/tsconfig.json",
+    "start": "node /Users/shelbulat/Work/support-bot/dist/index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "dotenv": "^16.6.1",
+    "grammy": "^1.38.3",
+    "pino": "^9.9.0",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.18.6",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild"
+    ]
+  }
+}
